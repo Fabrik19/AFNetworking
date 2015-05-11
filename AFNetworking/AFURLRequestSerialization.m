@@ -423,6 +423,9 @@ forHTTPHeaderField:(NSString *)field
     NSParameterAssert(request.HTTPBodyStream);
     NSParameterAssert([fileURL isFileURL]);
 
+    NSDictionary *protection = [NSDictionary dictionaryWithObject:NSFileProtectionComplete forKey:NSFileProtectionKey];
+    [[NSFileManager defaultManager] setAttributes:protection ofItemAtPath:fileURL.absoluteString error:nil];
+
     NSInputStream *inputStream = request.HTTPBodyStream;
     NSOutputStream *outputStream = [[NSOutputStream alloc] initWithURL:fileURL append:NO];
     __block NSError *error = nil;
@@ -474,13 +477,12 @@ forHTTPHeaderField:(NSString *)field
 
 - (NSURLRequest *)requestBySerializingRequest:(NSURLRequest *)request
                                withParameters:(id)parameters
-                                        error:(NSError *__autoreleasing *)error
-{
+                                        error:(NSError *__autoreleasing *)error {
     NSParameterAssert(request);
 
     NSMutableURLRequest *mutableRequest = [request mutableCopy];
 
-    [self.HTTPRequestHeaders enumerateKeysAndObjectsUsingBlock:^(id field, id value, BOOL * __unused stop) {
+    [self.HTTPRequestHeaders enumerateKeysAndObjectsUsingBlock:^(id field, id value, BOOL *__unused stop) {
         if (![request valueForHTTPHeaderField:field]) {
             [mutableRequest setValue:value forHTTPHeaderField:field];
         }
@@ -513,7 +515,9 @@ forHTTPHeaderField:(NSString *)field
             if (![mutableRequest valueForHTTPHeaderField:@"Content-Type"]) {
                 [mutableRequest setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
             }
-            [mutableRequest setHTTPBody:[query dataUsingEncoding:self.stringEncoding]];
+            if (query) {
+                [mutableRequest setHTTPBody:[query dataUsingEncoding:self.stringEncoding]];
+            }
         }
     }
 

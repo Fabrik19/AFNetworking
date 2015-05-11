@@ -308,12 +308,17 @@
 #pragma mark - NSCopying
 
 - (id)copyWithZone:(NSZone *)zone {
+    if (!self.session) {
+        return nil;
+    }
+
     AFHTTPSessionManager *HTTPClient = [[[self class] allocWithZone:zone] initWithBaseURL:self.baseURL sessionConfiguration:self.session.configuration];
-
-    HTTPClient.requestSerializer = [self.requestSerializer copyWithZone:zone];
-    HTTPClient.responseSerializer = [self.responseSerializer copyWithZone:zone];
-
+    if (HTTPClient) {
+        HTTPClient.requestSerializer = [self.requestSerializer copyWithZone:zone];
+        HTTPClient.responseSerializer = [self.responseSerializer copyWithZone:zone];
+    }
     return HTTPClient;
+
 }
 
 @end

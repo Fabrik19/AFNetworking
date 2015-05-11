@@ -604,10 +604,10 @@ willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challe
             if (self.credential) {
                 [[challenge sender] useCredential:self.credential forAuthenticationChallenge:challenge];
             } else {
-                [[challenge sender] continueWithoutCredentialForAuthenticationChallenge:challenge];
+                [[challenge sender] cancelAuthenticationChallenge:challenge];
             }
         } else {
-            [[challenge sender] continueWithoutCredentialForAuthenticationChallenge:challenge];
+            [[challenge sender] cancelAuthenticationChallenge:challenge];
         }
     }
 }
@@ -653,7 +653,6 @@ didReceiveResponse:(NSURLResponse *)response
         NSInteger totalNumberOfBytesWritten = 0;
         if ([self.outputStream hasSpaceAvailable]) {
             const uint8_t *dataBuffer = (uint8_t *)[data bytes];
-
             NSInteger numberOfBytesWritten = 0;
             while (totalNumberOfBytesWritten < (NSInteger)length) {
                 numberOfBytesWritten = [self.outputStream write:&dataBuffer[(NSUInteger)totalNumberOfBytesWritten] maxLength:(length - (NSUInteger)totalNumberOfBytesWritten)];
