@@ -270,12 +270,12 @@ static inline BOOL AFStateTransitionIsValid(AFOperationState fromState, AFOperat
 
 - (NSOutputStream *)outputStream {
     if (!_outputStream) {
-        self.outputStream = [NSOutputStream outputStreamToMemory];
+        _outputStream = [NSOutputStream outputStreamToMemory];
     }
 
     return _outputStream;
 }
-
+/*
 - (void)setOutputStream:(NSOutputStream *)outputStream {
     [self.lock lock];
     if (outputStream != _outputStream) {
@@ -287,6 +287,7 @@ static inline BOOL AFStateTransitionIsValid(AFOperationState fromState, AFOperat
     }
     [self.lock unlock];
 }
+*/
 
 #if defined(__IPHONE_OS_VERSION_MIN_REQUIRED) && !defined(AF_APP_EXTENSIONS)
 - (void)setShouldExecuteAsBackgroundTaskWithExpirationHandler:(void (^)(void))handler {
@@ -682,12 +683,13 @@ didReceiveResponse:(NSURLResponse *)response
     });
 }
 
+
 - (void)connectionDidFinishLoading:(NSURLConnection __unused *)connection {
     self.responseData = [self.outputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
 
     [self.outputStream close];
     if (self.responseData) {
-       self.outputStream = nil;
+       _outputStream = nil;
     }
 
     self.connection = nil;
@@ -702,7 +704,7 @@ didReceiveResponse:(NSURLResponse *)response
 
     [self.outputStream close];
     if (self.responseData) {
-        self.outputStream = nil;
+        _outputStream = nil;
     }
 
     self.connection = nil;
